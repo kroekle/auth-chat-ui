@@ -1,0 +1,13 @@
+.jwt-header {
+  display: contents;
+  cursor: pointer;
+}
+
+.jwt-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.title-text {
+  align-self: center;
+}

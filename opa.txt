@@ -1,0 +1,12 @@
+docker rm -fv opa-envoy
+docker run \
+-v "$(pwd)"/opa-conf.yaml:/conf/conf.yaml \
+-v "$(pwd)"/opa-policy.rego:/policy.rego \
+-p9191:9191 \
+-p8888:8181 \
+-d \
+--name opa-envoy \
+openpolicyagent/opa:0.28.0-envoy \
+run --server \
+--config-file=/conf/conf.yaml \
+policy.rego

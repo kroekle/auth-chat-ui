@@ -1,0 +1,16 @@
+.message-textarea {
+
+  font-size: 20px;
+  border: 2px solid black;
+  padding: 0px;
+  width: 90%;
+}
+
+.entry-body {
+  display: flex;
+  flex-direction: row;
+}
+
+.message-icon {
+  width: 10%;
+}
