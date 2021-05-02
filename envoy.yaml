@@ -46,6 +46,9 @@ static_resources:
             typed_config: 
               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
               failure_mode_allow: false
+              with_request_body:
+                allow_partial_message: true
+                max_request_bytes: 1048576
               grpc_service: 
                 google_grpc: 
                   stat_prefix: opa_ext_authz

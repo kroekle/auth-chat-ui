@@ -1,11 +1,12 @@
 /* eslint-disable import/no-anonymous-default-export */
-import React, { useEffect, useState} from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState} from 'react';
 import './Jwt.css';
 import { uniqueNamesGenerator, Config, starWars, adjectives } from 'unique-names-generator';
 import { Chip, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, Input, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
-import JWT from 'jsonwebtoken';
 import { setUser } from './shared/services/rest.services';
+import { JwtData } from './Types';
 
+var JWT = require('jsonwebtoken');
 const customConfig: Config = {
   dictionaries: [adjectives, starWars],
   separator: ' ',
@@ -14,63 +15,67 @@ const customConfig: Config = {
 
 interface Props {
   setJwt: (jwt:string) => void,
+  jwt: string,
   sub: number,
+  jwtData: JwtData | undefined,
+  setJwtData: (Dispatch<SetStateAction<JwtData|undefined>>),
 }
+export default ({jwt, jwtData, ...other}: Props) => {
 
-export default ({...other}: Props) => {
-
-  const [name, setName] = useState(uniqueNamesGenerator(customConfig));
-  const [roles, setRoles] = useState(["viewer", "admin"]);
   const [open, setOpen] = useState(false);
 
   return (
     <>
     <JwtDialog 
-      name={name} 
-      setName={setName}
-      roles={roles} 
-      setRoles={setRoles}
+      jwt={jwt}
+      jwtData={jwtData}
       open={open} 
       onClose={()=>setOpen(false)} 
       {...other}
       />
     <div className="jwt-header" onClick={()=>setOpen(!open)}>
 
-      <div className="title-text">{roles.toString()}</div>
-      <div className="title-text">{name}</div>
+      <div className="title-text">{jwtData && jwtData.roles && jwtData.roles.toString()}</div>
+      <div className="title-text">{jwtData && jwtData.name}</div>
     </div>
     </>
   );
 }
 
 interface DialogProps {
-  name: string,
-  roles: string[],
   open: boolean,
   sub: number,
+  jwt: string,
+  jwtData: JwtData | undefined,
   setJwt: (jwt:string) => void,
+  setJwtData: (Dispatch<SetStateAction<JwtData | undefined>>),
   onClose(): void,
-  setName: (name:string) => void,
-  setRoles: (roles:string[]) => void,
 }
-const JwtDialog = ({name, setName, roles, setRoles, open, onClose, setJwt, sub, ...other}: DialogProps) => {
+const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...other}: DialogProps) => {
 
   const [secret, setSecret] = useState("password");
   const [localJwt, setLocalJwt] = useState("");
 
   useEffect(() => {
-    var data = {
-      "sub": sub,
-      "name": name,
-      "roles": roles,
-      "active": true,
+    if (!jwtData) {
+      setJwtData({
+        name: uniqueNamesGenerator(customConfig),
+        roles: ["admin", "viewer"],
+        active: true,
+        sub: sub,
+      })
     }
-    var jwt = JWT.sign(data,secret);
-    setLocalJwt(jwt);
-    setJwt(jwt);
-    setUser(jwt, data);
+  },[jwtData, sub, setJwtData]);
 
-  }, [name, roles, secret, sub, setJwt])
+  useEffect(() => {
+    if (jwtData) {
+      var jwt = JWT.sign(jwtData,secret);
+      setLocalJwt(jwt);
+      setJwt(jwt);
+      setUser(jwt, jwtData);
+    }
+
+  }, [jwtData, secret, setJwt])
 
   return (
     <Dialog 
@@ -86,19 +91,19 @@ const JwtDialog = ({name, setName, roles, setRoles, open, onClose, setJwt, sub, 
             Update the claims below to see the effect on the JWT/application
           </DialogContentText>
         <div className="jwt-layout">
-          <TextField
-            value={name}
-            onChange={(event) => setName(event.target.value)}
+          {jwtData && <TextField
+            value={jwtData.name}
+            onChange={(event) => setJwtData(data => {data!.name = event.target.value; return data;})}
             label="Name"
-          />
-          <FormControl >
+          />}
+          { jwtData && <FormControl >
             <InputLabel id="roles-label">Roles</InputLabel>
             <Select
               labelId="roles-label"
               id="roles-select"
               multiple
-              value={roles}
-              onChange={(event) => setRoles(event.target.value as string[])}
+              value={jwtData.roles}
+              onChange={(event) => setJwtData((d) => {d!.roles = event.target.value as string[]; return d;})}
               input={<Input id="roles-select" />}
               renderValue={(selected) => (
                 <div >
@@ -114,7 +119,7 @@ const JwtDialog = ({name, setName, roles, setRoles, open, onClose, setJwt, sub, 
               <MenuItem key="4" value="chatter">Chatter</MenuItem>
               <MenuItem key="5" value="junk">Junk</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl>}
           <FormControl >
             <InputLabel id="secret-label">JWT Secret</InputLabel>
             <Select

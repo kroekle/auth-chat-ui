@@ -1,4 +1,4 @@
-.Body {
+.chat-body {
   text-align: center;
   height: 100%;
   display: flex;
@@ -36,6 +36,7 @@
   border-radius: 8px;
   text-align: left;
   width: fit-content;
+  max-width: 80%;
   justify-content: space-between;
 }
 

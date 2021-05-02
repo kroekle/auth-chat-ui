@@ -7,6 +7,13 @@ export interface User {
     blocked?: boolean,
 }
 
+export interface JwtData {
+  name: string,
+  roles: string[],
+  sub: number,
+  active: boolean,
+}
+
 export interface Message {
     message: string,
     from: number,

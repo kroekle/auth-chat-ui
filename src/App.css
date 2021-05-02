@@ -24,21 +24,36 @@
 
 .App-body {
   background-color: #3EC9D6;
+  height: 90vh;
+  display: flex;
   flex-direction: row;
-  padding: 5vh;
-  height: 80vh;
+}
+
+.Tab-body {
   align-items: center;
   display: flex;
   justify-content: center;
+  flex-direction: row;
+  padding: 5vh;
+  height: 80vh;
+  width: 60vw;
 }
 
 .User-body {
-  height: 70vh;
-  width: 20vw;
-  padding-right: 1%;
+  height: 90%;
+  width: 33%;
 }
 
 .Message-body {
-  height: 70vh;
-  width: 40vw;
+  height: 90%;
+  width: 66%;
+}
+
+.Tab-body {
+  margin: 5%;
+  height: 70%;
+  width: 100%;
+  max-width: 800px;
+  background-color: white;
+
 }

@@ -27,14 +27,36 @@ export default ({users, className, tempSub, jwt, ...other}: Props) => {
   const [message, setMessage] = useState<string>();
   const [list, setList] = useState<Named[]>();
   const Item = (user:Junk) => <div>{user.entity.name}</div>
-  // const [ref, setRef] = useState<ReactTextareaAutocomplete<User, React.TextareaHTMLAttributes<HTMLTextAreaElement>>|null>()
-
 
   const sendTheMessage = () => {
     if (message) {
-      sendMessage(jwt, {message:message, from: tempSub});
-      // ref!.s
+      var [m, t] = processMessage();
+      sendMessage(jwt, {message:m, from: tempSub, to: t});
     }
+  }
+
+  const processMessage = (): [string, number[] | undefined] => {
+
+
+    var subs = new Array<number>();
+
+    users.forEach(u => {
+      if (message?.includes("@" + u.name)) {
+        subs.push(u.sub);
+      }
+    });
+
+    var m = message?message.trim():"";
+    while (m.startsWith("@")) {
+      // eslint-disable-next-line no-loop-func
+      users.forEach(u => {
+        if (m.startsWith("@" + u.name)) {
+          m = m.substr(u.name.length + 1).trim();
+        }
+      })
+    }
+
+    return  [m, subs.length > 0? subs:undefined]
   }
 
   useEffect(() => {
@@ -59,7 +81,6 @@ export default ({users, className, tempSub, jwt, ...other}: Props) => {
           }}
           
           onChange={(e) => setMessage(e.target.value)}
-          // ref={refx => setRef(refx)}
         />}
         <IconButton onClick={()=>sendTheMessage()}>
           <SendIcon/>
