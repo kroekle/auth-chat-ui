@@ -31,7 +31,8 @@ export default ({users, className, tempSub, jwt, ...other}: Props) => {
   const sendTheMessage = () => {
     if (message) {
       var [m, t] = processMessage();
-      sendMessage(jwt, {message:m, from: tempSub, to: t});
+      sendMessage(jwt, {message:m, from: tempSub, to: t})
+      .catch((err:Error) => alert(err.message));
     }
   }
 
@@ -60,7 +61,9 @@ export default ({users, className, tempSub, jwt, ...other}: Props) => {
   }
 
   useEffect(() => {
-    setList(users.map(u => {return {"name":`@${u.name}`}}));
+    if (users && users.length > 0) {
+      setList(users.map(u => {return {"name":`@${u.name}`}}));
+    }
   }, [users])
 
   return (

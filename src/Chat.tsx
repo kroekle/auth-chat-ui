@@ -2,16 +2,12 @@
 import React, { useState, useEffect, forwardRef, Dispatch, SetStateAction } from 'react';
 
 import './Chat.css';
-import { Message, User, JwtData} from './Types';
+import { Message, User, JwtData, ErrResponse} from './Types';
 import Jwt from './Jwt';
 import { register, getMessages } from './shared/services/rest.services';
 import Entry from './Entry';
 import { useCookies } from 'react-cookie';
 
-const getAllMessages = (jwt: string, sub: number, setMessages: (messages:Message[]) => void, setLinks: (links: string[]) => void) => {
-  getMessages(jwt, sub, setLinks)
-    .then(res => setMessages(res));
-}
 
 interface Props {
   jwt: string,
@@ -22,11 +18,18 @@ interface Props {
   setLinks: (links: string[]) => void
 }
 export default ({users, jwt, setLinks, ...other}:Props) => {
-
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const ref = React.createRef<HTMLDivElement>();
   const [sub, setSub] = useState<number>();
   const [cookies, setCookie] = useCookies(['subject']);
+  const [errMsg, setErrMsg] = useState<string>();
+
+  const getAllMessages = (jwt: string, sub: number, setMessages: (messages:Message[]) => void, setLinks: (links: string[]) => void) => {
+    getMessages(jwt, sub, setLinks)
+      .then(res => {setMessages(res); setErrMsg(undefined);})
+      .catch((err:Error) => {setErrMsg(err.message); setMessages([]);});
+  }
 
   useEffect(() => {
     if (jwt && sub) {
@@ -61,9 +64,12 @@ export default ({users, jwt, setLinks, ...other}:Props) => {
       {sub && <Entry {...other} tempSub={sub} jwt={jwt} users={users} className="chat-entry"/>}
       <div className="chat-messages"> 
           {
-            sub && messages && messages.map((msg, i) => (
+            sub && !errMsg && messages && messages.map((msg, i) => (
               <MessageBox users={users} ref={ref} key={i} message={msg} subject={sub}/>
             ))
+          }
+          {
+            sub && errMsg && <MessageBox users={users} ref={ref} key="1" message={{from: -1, message: errMsg}} subject={sub}/>
           }
       </div>
       <div className="chat-jwt">
@@ -106,7 +112,7 @@ const MessageBox = forwardRef<HTMLDivElement, MessageProps>(({message, users, su
 
   const getName = (sub: number):string => {
     var name = "[Unknown]";
-    users.forEach(u => {if (u.sub === sub) name = u.name})
+    users && users.length && users.forEach(u => {if (u.sub === sub) name = u.name})
     return name;
   }
 

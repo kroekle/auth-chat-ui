@@ -1,16 +1,4 @@
-import { Message, User } from "../../Types"
-
-export const getUser = async (jwt: string, sub: number): Promise<User> => {
-    const res = await fetch('/users', 
-    {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json',
-            'authorization': `Bearer ${jwt}`
-            },
-    });
-    return res.json();
-}
+import { ErrResponse, Message, User } from "../../Types"
 
 export const register = async (): Promise<number> => {
     const res = await fetch('/users/register', {method: 'POST'});
@@ -27,6 +15,11 @@ export const getUsers = async (jwt: string): Promise<User[]> => {
             'authorization': `Bearer ${jwt}`
             },
     });
+
+    if (!res.ok) {
+        const errMsg: ErrResponse = await res.json();
+        throw new Error(errMsg.msg);
+    }
     return res.json();
 }
 
@@ -44,7 +37,7 @@ export const setUser = async (jwt: string, user: User): Promise<void> => {
 }
 
 export const sendMessage = async (jwt: string, message: Message): Promise<void> => {
-    await fetch(`/messages`, 
+    const res = await fetch(`/messages`, 
     {
         method: 'POST',
         body: JSON.stringify(message),
@@ -53,7 +46,11 @@ export const sendMessage = async (jwt: string, message: Message): Promise<void> 
             'authorization': `Bearer ${jwt}`
             },
     });
-    return;
+    if (!res.ok) {
+        const errMsg: ErrResponse = await res.json();
+        throw new Error(errMsg.msg);
+    }
+    return Promise.resolve();
 }
 
 export const getMessages = async (jwt: string, tempSub: number, setLinks: (links: string[]) => void): Promise<Message[]> => {
@@ -68,5 +65,9 @@ export const getMessages = async (jwt: string, tempSub: number, setLinks: (links
 
     res.headers.has("links") && setLinks(res.headers.get("links")!.split("|"))
 
+    if (!res.ok) {
+        const errMsg: ErrResponse = await res.json();
+        throw new Error(errMsg.msg);
+    }
     return res.json()
 }

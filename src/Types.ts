@@ -14,6 +14,10 @@ export interface JwtData {
   active: boolean,
 }
 
+export interface ErrResponse {
+  msg: string,
+}
+
 export interface Message {
     message: string,
     from: number,
