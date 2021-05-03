@@ -55,6 +55,7 @@ const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...oth
 
   const [secret, setSecret] = useState("password");
   const [localJwt, setLocalJwt] = useState("");
+  const [name, setName] = useState<string>();
 
   useEffect(() => {
     if (!jwtData) {
@@ -63,9 +64,15 @@ const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...oth
         roles: ["admin", "viewer"],
         active: true,
         sub: sub,
-      })
+      });
     }
   },[jwtData, sub, setJwtData]);
+
+  useEffect(() => {
+    if (jwtData) {
+      setName(jwtData.name);
+    }
+  }, [jwtData]);
 
   useEffect(() => {
     if (jwtData) {
@@ -92,8 +99,9 @@ const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...oth
           </DialogContentText>
         <div className="jwt-layout">
           {jwtData && <TextField
-            value={jwtData.name}
-            onChange={(event) => setJwtData(data => {data!.name = event.target.value; return data;})}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            onBlur={() => setJwtData(d => { return {...d!, name: name!}})}
             label="Name"
           />}
           { jwtData && <FormControl >
@@ -103,7 +111,7 @@ const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...oth
               id="roles-select"
               multiple
               value={jwtData.roles}
-              onChange={(event) => setJwtData((d) => {d!.roles = event.target.value as string[]; return d;})}
+              onChange={(event) => setJwtData((d) => {return {...d!, roles: event.target.value as string[]};})}
               input={<Input id="roles-select" />}
               renderValue={(selected) => (
                 <div >
