@@ -2,7 +2,7 @@
 import React, { useState, useEffect, forwardRef, Dispatch, SetStateAction } from 'react';
 
 import './Chat.css';
-import { Message, User, JwtData, ErrResponse} from './Types';
+import { Message, User, JwtData} from './Types';
 import Jwt from './Jwt';
 import { register, getMessages } from './shared/services/rest.services';
 import Entry from './Entry';

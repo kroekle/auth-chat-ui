@@ -7,7 +7,6 @@ import { JwtData, User } from './Types';
 import Users from './Users';
 import { Tab, Tabs } from '@material-ui/core';
 
-
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [jwt, setJwt] = useState("");
@@ -33,6 +32,7 @@ function App() {
             <Tab label="Other"/>
             { links.includes('odd') && <Tab label="Odd"/>}
             { links.includes('even') && <Tab label="Even"/>}
+            { links.includes('decisions') && <Tab label="Decisions"/>}
         </Tabs>
 
         <TabPanel value={tabIdx} index={0}>
@@ -44,13 +44,16 @@ function App() {
           </Paper>
         </TabPanel>
         <TabPanel value={tabIdx} index={i++}>
-          <div> Hello</div>
+          <img src="https://www.meme-arsenal.com/memes/18dd65a4bbf5d5613ab50f7c9dc543d6.jpg"/>
         </TabPanel>
         { links.includes('odd') && <TabPanel value={tabIdx} index={i++}>
           <div> You are Odd</div>
         </TabPanel>}
         { links.includes('even') && <TabPanel value={tabIdx} index={i++}>
           <div> You are Not Odd</div>
+        </TabPanel>}
+        { links.includes('decisions') && <TabPanel value={tabIdx} index={i++}>
+          <div> Show decisions</div>
         </TabPanel>}
       </div>
     </div>
