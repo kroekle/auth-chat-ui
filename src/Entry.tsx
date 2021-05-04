@@ -20,7 +20,7 @@ interface Props {
   jwt: string,
   users: User[],
   className: string,
-  tempSub: number,
+  tempSub: string,
 }
 export default ({users, className, tempSub, jwt, ...other}: Props) => {
 
@@ -36,10 +36,10 @@ export default ({users, className, tempSub, jwt, ...other}: Props) => {
     }
   }
 
-  const processMessage = (): [string, number[] | undefined] => {
+  const processMessage = (): [string, string[] | undefined] => {
 
 
-    var subs = new Array<number>();
+    var subs = new Array<string>();
 
     users.forEach(u => {
       if (message?.includes("@" + u.name)) {

@@ -21,11 +21,11 @@ export default ({users, jwt, setLinks, ...other}:Props) => {
   
   const [messages, setMessages] = useState<Message[]>([]);
   const ref = React.createRef<HTMLDivElement>();
-  const [sub, setSub] = useState<number>();
+  const [sub, setSub] = useState<string>();
   const [cookies, setCookie] = useCookies(['subject']);
   const [errMsg, setErrMsg] = useState<string>();
 
-  const getAllMessages = (jwt: string, sub: number, setMessages: (messages:Message[]) => void, setLinks: (links: string[]) => void) => {
+  const getAllMessages = (jwt: string, sub: string, setMessages: (messages:Message[]) => void, setLinks: (links: string[]) => void) => {
     getMessages(jwt, sub, setLinks)
       .then(res => {setMessages(res); setErrMsg(undefined);})
       .catch((err:Error) => {setErrMsg(err.message); setMessages([]);});
@@ -41,7 +41,7 @@ export default ({users, jwt, setLinks, ...other}:Props) => {
 
   useEffect(() => {
     if (cookies.subject) {
-      setSub(cookies.subject as number)
+      setSub(cookies.subject)
     } else {
       console.log(`registering`);
       register().then(sub => {
@@ -69,7 +69,7 @@ export default ({users, jwt, setLinks, ...other}:Props) => {
             ))
           }
           {
-            sub && errMsg && <MessageBox users={users} ref={ref} key="1" message={{from: -1, message: errMsg}} subject={sub}/>
+            sub && errMsg && <MessageBox users={users} ref={ref} key="1" message={{from: "-1", message: errMsg}} subject={sub}/>
           }
       </div>
       <div className="chat-jwt">
@@ -81,7 +81,7 @@ export default ({users, jwt, setLinks, ...other}:Props) => {
 
 interface MessageProps {
   message: Message,
-  subject: number,
+  subject: string,
   users: User[],
 }
 const MessageBox = forwardRef<HTMLDivElement, MessageProps>(({message, users, subject}:MessageProps, ref) => {
@@ -110,7 +110,7 @@ const MessageBox = forwardRef<HTMLDivElement, MessageProps>(({message, users, su
     return classes;
   }
 
-  const getName = (sub: number):string => {
+  const getName = (sub: string):string => {
     var name = "[Unknown]";
     users && users.length && users.forEach(u => {if (u.sub === sub) name = u.name})
     return name;

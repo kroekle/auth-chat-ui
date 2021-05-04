@@ -16,7 +16,7 @@ const customConfig: Config = {
 interface Props {
   setJwt: (jwt:string) => void,
   jwt: string,
-  sub: number,
+  sub: string,
   jwtData: JwtData | undefined,
   setJwtData: (Dispatch<SetStateAction<JwtData|undefined>>),
 }
@@ -44,7 +44,7 @@ export default ({jwt, jwtData, ...other}: Props) => {
 
 interface DialogProps {
   open: boolean,
-  sub: number,
+  sub: string,
   jwt: string,
   jwtData: JwtData | undefined,
   setJwt: (jwt:string) => void,

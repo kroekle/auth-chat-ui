@@ -1,9 +1,9 @@
 import { ErrResponse, Message, User } from "../../Types"
 
-export const register = async (): Promise<number> => {
+export const register = async (): Promise<string> => {
     const res = await fetch('/users/register', {method: 'POST'});
     const res_1 = await res.json();
-    return (res_1 as {subject:number}).subject;
+    return (res_1 as {subject:string}).subject;
 }
 
 export const getUsers = async (jwt: string): Promise<User[]> => {
@@ -53,8 +53,8 @@ export const sendMessage = async (jwt: string, message: Message): Promise<void> 
     return Promise.resolve();
 }
 
-export const getMessages = async (jwt: string, tempSub: number, setLinks: (links: string[]) => void): Promise<Message[]> => {
-    const res = await fetch(`/messages?sub=${tempSub}`, 
+export const getMessages = async (jwt: string, sub: string, setLinks: (links: string[]) => void): Promise<Message[]> => {
+    const res = await fetch(`/messages?sub=${sub}`, 
     {
         method: 'GET',
         headers: {
