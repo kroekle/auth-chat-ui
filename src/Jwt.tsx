@@ -61,7 +61,7 @@ const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...oth
     if (!jwtData) {
       setJwtData({
         name: uniqueNamesGenerator(customConfig),
-        roles: ["admin", "viewer"],
+        roles: ["viewer"],
         active: true,
         sub: sub,
       });
@@ -123,9 +123,8 @@ const JwtDialog = ({open, jwt, jwtData, onClose, setJwt, setJwtData, sub, ...oth
             >
               <MenuItem key="1" value="admin">Admin</MenuItem>
               <MenuItem key="2" value="viewer">Viewer</MenuItem>
-              <MenuItem key="3" value="blocker">Blocker</MenuItem>
-              <MenuItem key="4" value="chatter">Chatter</MenuItem>
-              <MenuItem key="5" value="junk">Junk</MenuItem>
+              <MenuItem key="3" value="chatter">Chatter</MenuItem>
+              <MenuItem key="4" value="filtered">Filtered</MenuItem>
             </Select>
           </FormControl>}
           <FormControl >

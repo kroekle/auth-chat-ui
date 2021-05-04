@@ -5,4 +5,5 @@ module.exports = function(app) {
     // app.use(proxy('/messages', { target: 'http://localhost:8778'}));
     app.use(proxy('/users', { target: 'http://localhost:9000'}));
     app.use(proxy('/messages', { target: 'http://localhost:9000'}));
+    app.use(proxy('/decisions', {target: 'http://localhost:8779'}))
 }

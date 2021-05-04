@@ -6,6 +6,7 @@ import Chat from './Chat';
 import { JwtData, User } from './Types';
 import Users from './Users';
 import { Tab, Tabs } from '@material-ui/core';
+import Decisions from './Decisions';
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
@@ -44,7 +45,7 @@ function App() {
           </Paper>
         </TabPanel>
         <TabPanel value={tabIdx} index={i++}>
-          <img src="https://www.meme-arsenal.com/memes/18dd65a4bbf5d5613ab50f7c9dc543d6.jpg"/>
+          <img src="https://www.meme-arsenal.com/memes/18dd65a4bbf5d5613ab50f7c9dc543d6.jpg" alt="move along, move along"/>
         </TabPanel>
         { links.includes('odd') && <TabPanel value={tabIdx} index={i++}>
           <div> You are Odd</div>
@@ -53,7 +54,7 @@ function App() {
           <div> You are Not Odd</div>
         </TabPanel>}
         { links.includes('decisions') && <TabPanel value={tabIdx} index={i++}>
-          <div> Show decisions</div>
+          <Decisions />
         </TabPanel>}
       </div>
     </div>

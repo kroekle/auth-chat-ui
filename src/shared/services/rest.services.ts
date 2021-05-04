@@ -71,3 +71,13 @@ export const getMessages = async (jwt: string, tempSub: number, setLinks: (links
     }
     return res.json()
 }
+
+export const getDecisions = async (): Promise<any[]> => {
+    const res = await fetch(`/decisions`);
+
+    if (!res.ok) {
+        const errMsg: ErrResponse = await res.json();
+        throw new Error(errMsg.msg);
+    }
+    return res.json();
+}
