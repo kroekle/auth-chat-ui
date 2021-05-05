@@ -1,5 +1,5 @@
 run envoy locally for development
 
-docker build . -t chat-proxy
+docker build -f Dockerfile-envoy . -t chat-proxy
 docker rm -fv my-chat-proxy
 docker run -p 9000:9000 -d --name=my-chat-proxy chat-proxy
