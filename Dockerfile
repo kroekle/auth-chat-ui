@@ -1,5 +1,7 @@
 #base on blog post: https://medium.com/@tiangolo/react-in-docker-with-nginx-built-with-multi-stage-docker-builds-including-testing-8cc49d6ec305
 
+# docker build -t gcr.io/cloud-native-madison/auth-chat-ui:v1-0 .
+
 # Stage 0, "build-stage"
 FROM node:current-slim as build-stage
 

@@ -1,0 +1,36 @@
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: auth-chat
+  annotations:
+    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.global-static-ip-name: cnm-ip
+    networking.gke.io/managed-certificates: cnm-cert
+    kubernetes.io/ingress.class: "gce"
+spec:
+  rules:
+  - host: "chat.cnm.kurtspace.com"
+    http:
+      paths:
+      - path: /users
+        backend:
+          serviceName: auth-chat-users
+          servicePort: 80        
+      - path: /users/*
+        backend:
+          serviceName: auth-chat-users
+          servicePort: 80        
+      - path: /messages
+        backend:
+          serviceName: auth-chat-messages
+          servicePort: 80        
+      # - path: /decisions
+      #   backend:
+      #     serviceName: auth-chat-decisions
+      #     servicePort: 80        
+      - path: /*
+        backend:
+          serviceName: auth-chat-ui
+          servicePort: 80        

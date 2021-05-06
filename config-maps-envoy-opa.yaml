@@ -1,0 +1,90 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: opa-config
+data:
+  conf.yaml: |
+      decision_logs:
+        console: true
+      default_decision: rules/main
+      plugins:
+        envoy_ext_authz_grpc:
+          addr: 0.0.0.0:9191
+          dry-run: false
+          path: rules/main
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: envoy-config
+data:
+  envoy.yaml: |
+    admin:
+      access_log_path: /tmp/admin_access.log
+      address:
+        socket_address: 
+          address: 0.0.0.0
+          port_value: 9901
+    static_resources:
+      listeners:
+      - name: listener_0
+        address:
+          socket_address:
+            protocol: TCP
+            address: 0.0.0.0
+            port_value: 8000
+        filter_chains:
+        - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: ingress_http
+              route_config:
+                name: local_route
+                virtual_hosts:
+                - name: local_services
+                  domains: ["*"]
+                  routes:
+                  - match: 
+                      prefix: "/"
+                    route:
+                      cluster: local_service
+                  cors:
+                    allow_methods: GET, PUT, DELETE, POST, OPTIONS
+                    allow_headers: keep-alive,user-agent,cache-control,content-type,authorization
+                    max_age: "1728000"
+              http_filters:
+              - name: envoy.filters.http.cors
+              - name: envoy.filters.http.ext_authz
+                typed_config: 
+                  "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+                  failure_mode_allow: false
+                  with_request_body:
+                    allow_partial_message: true
+                    max_request_bytes: 1048576
+                  grpc_service: 
+                    google_grpc: 
+                      stat_prefix: opa_ext_authz
+                      target_uri: "127.0.0.1:9191"
+                    timeout: 1s
+                  metadata_context_namespaces: 
+                    - envoy.filters.http.header_to_metadata
+                  transport_api_version: V3
+              - name: envoy.filters.http.router
+      clusters:
+      - name: local_service
+        connect_timeout: 0.25s
+        type: static
+        lb_policy: ROUND_ROBIN
+        load_assignment:
+          cluster_name: local_service
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 80

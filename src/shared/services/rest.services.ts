@@ -1,4 +1,4 @@
-import { ErrResponse, Message, User } from "../../Types"
+import { Message, User } from "../../Types"
 
 export const register = async (): Promise<string> => {
     const res = await fetch('/users/register', {method: 'POST'});
@@ -17,8 +17,7 @@ export const getUsers = async (jwt: string): Promise<User[]> => {
     });
 
     if (!res.ok) {
-        const errMsg: ErrResponse = await res.json();
-        throw new Error(errMsg.msg);
+        throw new Error(res.headers.has("msg")?res.headers.get("msg")!:"[unknown]");
     }
     return res.json();
 }
@@ -47,8 +46,7 @@ export const sendMessage = async (jwt: string, message: Message): Promise<void> 
             },
     });
     if (!res.ok) {
-        const errMsg: ErrResponse = await res.json();
-        throw new Error(errMsg.msg);
+        throw new Error(res.headers.has("msg")?res.headers.get("msg")!:"[unknown]");
     }
     return Promise.resolve();
 }
@@ -66,8 +64,7 @@ export const getMessages = async (jwt: string, sub: string, setLinks: (links: st
     res.headers.has("links") && setLinks(res.headers.get("links")!.split("|"))
 
     if (!res.ok) {
-        const errMsg: ErrResponse = await res.json();
-        throw new Error(errMsg.msg);
+        throw new Error(res.headers.has("msg")?res.headers.get("msg")!:"[unknown]");
     }
     return res.json()
 }
@@ -76,8 +73,7 @@ export const getDecisions = async (): Promise<any[]> => {
     const res = await fetch(`/decisions`);
 
     if (!res.ok) {
-        const errMsg: ErrResponse = await res.json();
-        throw new Error(errMsg.msg);
+        throw new Error(res.headers.has("msg")?res.headers.get("msg")!:"[unknown]");
     }
     return res.json();
 }

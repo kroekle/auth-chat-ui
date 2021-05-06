@@ -1,0 +1,283 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-chat-messages
+spec:
+  selector:
+    app: auth-chat-messages
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-chat-messages
+  labels:
+    app: auth-chat-messages
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-chat-messages
+  template:
+    metadata:
+      labels:
+        app: auth-chat-messages
+    spec:
+      containers:
+      - name: auth-chat-messages
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /messages
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /messages
+            port: 80
+        image: gcr.io/cloud-native-madison/auth-chat-message:v1-0
+        ports:
+        - containerPort: 80
+        - containerPort: 8000
+        - containerPort: 8181
+      - args:
+        - envoy
+        - --config-path
+        - /config/envoy.yaml
+        env:
+        - name: ENVOY_UID
+          value: "1111"
+        image: "envoyproxy/envoy:v1.18.2"
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /config
+          name: envoy-config-vol
+          readOnly: true
+      - args:
+        - "run"
+        - "--ignore=.*"
+        - "--server"
+        - "--config-file=/config/conf.yaml"
+        - "/policies"
+        image: "openpolicyagent/opa:0.27.1-envoy-1"
+        imagePullPolicy: IfNotPresent
+        name: opa
+        resources: {}
+        securityContext:
+          runAsUser: 1111
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /policies
+          name: policy-vol
+          readOnly: true
+        - mountPath: /config
+          name: opa-config-vol
+          readOnly: true
+      volumes:
+      - configMap:
+          name: opa-config
+        name: opa-config-vol
+      - configMap:
+          name: envoy-config
+        name: envoy-config-vol
+      - configMap:
+          name: policy
+        name: policy-vol
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-chat-users
+spec:
+  selector:
+    app: auth-chat-users
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-chat-users
+  labels:
+    app: auth-chat-users
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-chat-users
+  template:
+    metadata:
+      labels:
+        app: auth-chat-users
+    spec:
+      containers:
+      - name: auth-chat-users
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /users
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /users
+            port: 80
+        image: gcr.io/cloud-native-madison/auth-chat-user:v1-0
+        ports:
+        - containerPort: 80
+        - containerPort: 8000
+        - containerPort: 8181
+      - args:
+        - envoy
+        - --config-path
+        - /config/envoy.yaml
+        env:
+        - name: ENVOY_UID
+          value: "1111"
+        image: "envoyproxy/envoy:v1.18.2"
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /config
+          name: envoy-config-vol
+          readOnly: true
+      - args:
+        - "run"
+        - "--ignore=.*"
+        - "--server"
+        - "--config-file=/config/conf.yaml"
+        - "/policies"
+        image: "openpolicyagent/opa:0.27.1-envoy-1"
+        imagePullPolicy: IfNotPresent
+        name: opa
+        resources: {}
+        securityContext:
+          runAsUser: 1111
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /policies
+          name: policy-vol
+          readOnly: true
+        - mountPath: /config
+          name: opa-config-vol
+          readOnly: true
+      volumes:
+      - configMap:
+          name: opa-config
+        name: opa-config-vol
+      - configMap:
+          name: envoy-config
+        name: envoy-config-vol
+      - configMap:
+          name: policy
+        name: policy-vol
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-chat-ui
+spec:
+  selector:
+    app: auth-chat-ui
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-chat-ui
+  labels:
+    app: auth-chat-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-chat-ui
+  template:
+    metadata:
+      labels:
+        app: auth-chat-ui
+    spec:
+      containers:
+      - name: auth-chat-ui
+        image: gcr.io/cloud-native-madison/auth-chat-ui:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-chat-decisions
+spec:
+  selector:
+    app: auth-chat-decisions
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-chat-decisions
+  labels:
+    app: auth-chat-decisions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-chat-decisions
+  template:
+    metadata:
+      labels:
+        app: auth-chat-decisions
+    spec:
+      containers:
+      - name: auth-chat-decisions
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /decisions
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /decisions
+            port: 80
+        image: gcr.io/cloud-native-madison/auth-chat-decisions:v1-0
+        ports:
+        - containerPort: 80

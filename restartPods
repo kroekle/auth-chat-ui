@@ -1,0 +1,1 @@
+kubectl rollout restart deployment/auth-chat-messages deployment/auth-chat-users
