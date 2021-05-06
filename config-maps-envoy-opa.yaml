@@ -5,8 +5,6 @@ metadata:
   name: opa-config
 data:
   conf.yaml: |
-      decision_logs:
-        console: true
       default_decision: rules/main
       plugins:
         envoy_ext_authz_grpc:
